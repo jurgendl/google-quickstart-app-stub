@@ -3,6 +3,7 @@ package org.jhaws.google.test;
 import org.jhaws.common.web.spring.AdaptingPropertySourceFactory;
 import org.jhaws.google.calendar.CalendarApi;
 import org.jhaws.google.drive.DriveApi;
+import org.jhaws.google.gmail.GmailApi;
 import org.jhaws.google.search.SearchApi;
 import org.jhaws.google.youtube.YoutubeApi;
 import org.springframework.context.annotation.Bean;
@@ -51,5 +52,10 @@ public class TestConfig {
 	@Bean
 	public SearchApi searchApi() {
 		return new SearchApi();
+	}
+
+	@Bean
+	public GmailApi gmailApi() {
+		return new GmailApi();
 	}
 }

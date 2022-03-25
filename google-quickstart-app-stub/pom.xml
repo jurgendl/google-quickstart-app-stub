@@ -51,6 +51,7 @@
 		<version.google-api-services-youtube>v3-rev20220312-1.32.1</version.google-api-services-youtube><!-- google-api-services-youtube -->
 		<version.google-api-services-calendar>v3-rev20220203-1.32.1</version.google-api-services-calendar><!-- google-api-services-calendar -->
 		<version.google-api-services-customsearch>v1-rev20210918-1.32.1</version.google-api-services-customsearch><!-- google-api-services-customsearch -->
+		<version.google-api-services-gmail>v1-rev20220307-1.32.1</version.google-api-services-gmail>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -76,6 +77,16 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+		<!-- <dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.6.2</version>
+		</dependency> -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -115,6 +126,11 @@
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-customsearch</artifactId>
 			<version>${version.google-api-services-customsearch}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-gmail</artifactId>
+			<version>${version.google-api-services-gmail}</version>
 		</dependency>
 		<!-- Testing dependencies -->
 		<dependency>

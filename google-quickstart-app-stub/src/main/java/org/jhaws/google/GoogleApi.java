@@ -28,10 +28,12 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.youtube.YouTubeScopes;
 
+// ENABLE API FOR APP: https://console.cloud.google.com/apis/dashboard?project={projectname_hash}
 // https://console.cloud.google.com/home/dashboard
-// https://console.developers.google.com/apis/dashboard?project={!!!!!!!!!!!!!!!!!!!project_id!!!!!!!!!!!!!!!!!!!}&authuser=0
+// https://console.developers.google.com/apis/dashboard?project={projectname_hash}&authuser=0
 // https://developers.google.com/api-client-library
 // https://developers.google.com/api-client-library/java/
 // https://developers.google.com/api-client-library/java/google-api-java-client/dev-guide
@@ -45,6 +47,7 @@ public abstract class GoogleApi<S> {
 			, DriveScopes.DRIVE_METADATA_READONLY//
 			, DriveScopes.DRIVE_READONLY//
 			, CalendarScopes.CALENDAR//
+			, GmailScopes.GMAIL_READONLY //
 	);
 
 	@Value("${google.credentials_file_path}")
