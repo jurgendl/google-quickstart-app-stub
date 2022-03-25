@@ -30,15 +30,20 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.youtube.YouTubeScopes;
 
-// https://developers.google.com/api-client-library/java/
+// https://console.cloud.google.com/home/dashboard
 // https://console.developers.google.com/apis/dashboard?project={!!!!!!!!!!!!!!!!!!!project_id!!!!!!!!!!!!!!!!!!!}&authuser=0
+// https://developers.google.com/api-client-library
+// https://developers.google.com/api-client-library/java/
+// https://developers.google.com/api-client-library/java/google-api-java-client/dev-guide
 // https://developers.google.com/api-client-library/dotnet/guide/aaa_client_secrets
+// https://github.com/googleapis/google-api-java-client-services#supported-google-apis
 public abstract class GoogleApi<S> {
 	protected static final JsonFactory JSON_FACTORY = com.google.api.client.json.gson.GsonFactory.getDefaultInstance();
 
 	protected Collection<String> scopes = Arrays.asList(//
 			YouTubeScopes.YOUTUBE_READONLY//
 			, DriveScopes.DRIVE_METADATA_READONLY//
+			, DriveScopes.DRIVE_READONLY//
 			, CalendarScopes.CALENDAR//
 	);
 
@@ -81,12 +86,14 @@ public abstract class GoogleApi<S> {
 			String userHome = System.getProperty("user.home");
 			Path credentialsPath = Paths.get(userHome).resolve(credentialsFilePath);
 			InputStream in = Files.newInputStream(credentialsPath);
-			if (in == null) throw new FileNotFoundException("Resource not found: " + credentialsFilePath);
+			if (in == null)
+				throw new FileNotFoundException("Resource not found: " + credentialsFilePath);
 			GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 			// Build flow and trigger user authorization request.
 			Path quickstartTokensPath = Paths.get(userHome).resolve(quickstartTokens);
 			FileDataStoreFactory dataStore = new FileDataStoreFactory(quickstartTokensPath.toFile());
-			GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, scopes).setDataStoreFactory(dataStore).setAccessType("offline").build();
+			GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
+					clientSecrets, scopes).setDataStoreFactory(dataStore).setAccessType("offline").build();
 			LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(port).build();
 			return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 		} catch (IOException ex) {
@@ -148,7 +155,8 @@ public abstract class GoogleApi<S> {
 			if (ex1.getStatusCode() == 403) {
 				try {
 					try {
-						Files.delete(Paths.get(System.getProperty("user.home")).resolve(quickstartTokens).resolve("StoredCredential"));
+						Files.delete(Paths.get(System.getProperty("user.home")).resolve(quickstartTokens)
+								.resolve("StoredCredential"));
 						this.service = null;
 						getService();
 					} catch (IOException ioex) {

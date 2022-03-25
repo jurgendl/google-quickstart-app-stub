@@ -1,5 +1,9 @@
 package org.jhaws.google.test.drive;
 
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.jhaws.google.drive.DriveApi;
@@ -11,6 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
+import com.google.api.services.drive.Drive.Files.Get;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
@@ -22,12 +29,27 @@ public class DriveTest {
 	@Autowired
 	DriveApi driveApi;
 
+	class CustomProgressListener implements MediaHttpDownloaderProgressListener {
+		public void progressChanged(MediaHttpDownloader downloader) {
+			switch (downloader.getDownloadState()) {
+			case MEDIA_IN_PROGRESS:
+				System.out.println(downloader.getProgress());
+				break;
+			case MEDIA_COMPLETE:
+				System.out.println("Download is complete!");
+			default:
+				break;
+			}
+		}
+	}
+
 	@Test
 	public void test() {
 		driveApi.doAction(driveService -> {
 			FileList result;
 			try {
-				result = driveService.files().list().setPageSize(10).setFields("nextPageToken, files(id, name)").execute();
+				result = driveService.files().list().setPageSize(10).setFields("nextPageToken, files(id, name)")
+						.execute();
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			}
@@ -38,6 +60,15 @@ public class DriveTest {
 				System.out.println("Files:");
 				for (File file : files) {
 					System.out.printf("%s (%s)\n", file.getName(), file.getId());
+				}
+
+				{
+					Path path = Paths.get(System.getProperty("java.io.tmpdir"), files.get(0).getName());
+					System.out.println(path);
+					OutputStream out = Files.newOutputStream(path);
+					Get request = driveService.files().get(files.get(0).getId());
+					request.getMediaHttpDownloader().setProgressListener(new CustomProgressListener());
+					request.executeMediaAndDownloadTo(out);
 				}
 			}
 			return Void.TYPE;

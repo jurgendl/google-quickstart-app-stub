@@ -9,6 +9,7 @@ import com.google.api.services.calendar.Calendar;
 public class CalendarApi extends GoogleApi<Calendar> {
 	@Override
 	protected Calendar createService() {
-		return new Calendar.Builder(httpTransport, JSON_FACTORY, getCredentials()).setApplicationName(applicationName).build();
+		return new Calendar.Builder(httpTransport, JSON_FACTORY, getCredentials()).setApplicationName(applicationName)
+				.build();
 	}
 }
