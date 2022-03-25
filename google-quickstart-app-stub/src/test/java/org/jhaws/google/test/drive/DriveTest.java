@@ -46,30 +46,49 @@ public class DriveTest {
 	@Test
 	public void test() {
 		driveApi.doAction(driveService -> {
-			FileList result;
-			try {
-				result = driveService.files().list().setPageSize(10).setFields("nextPageToken, files(id, name)")
-						.execute();
-			} catch (Exception ex) {
-				throw new RuntimeException(ex);
-			}
-			List<File> files = result.getFiles();
-			if (files == null || files.isEmpty()) {
-				System.out.println("No files found.");
-			} else {
-				System.out.println("Files:");
-				for (File file : files) {
-					System.out.printf("%s (%s)\n", file.getName(), file.getId());
+			if (false) {
+				FileList result;
+				try {
+					result = driveService.files().list().setPageSize(10).setFields("nextPageToken, files(id, name)")
+							.execute();
+				} catch (Exception ex) {
+					throw new RuntimeException(ex);
 				}
+				List<File> files = result.getFiles();
+				if (files == null || files.isEmpty()) {
+					System.out.println("No files found.");
+				} else {
+					System.out.println("Files:");
+					for (File file : files) {
+						System.out.printf("%s (%s)\n", file.getName(), file.getId());
+					}
 
-				{
-					Path path = Paths.get(System.getProperty("java.io.tmpdir"), files.get(0).getName());
-					System.out.println(path);
-					OutputStream out = Files.newOutputStream(path);
-					Get request = driveService.files().get(files.get(0).getId());
-					request.getMediaHttpDownloader().setProgressListener(new CustomProgressListener());
-					request.executeMediaAndDownloadTo(out);
+					if (false) {
+						Path path = Paths.get(System.getProperty("java.io.tmpdir"), files.get(0).getName());
+						System.out.println(path);
+						OutputStream out = Files.newOutputStream(path);
+						Get request = driveService.files().get(files.get(0).getId());
+						request.getMediaHttpDownloader().setProgressListener(new CustomProgressListener());
+						// request.getMediaHttpDownloader().setDirectDownloadEnabled(true);
+						request.executeMediaAndDownloadTo(out);
+						// request.executeMediaAsInputStream();
+					}
 				}
+			}
+			if (false) {
+				int pages = 0;
+				String pageToken = null;
+				do {
+					FileList result = driveService.files().list().setQ("mimeType='image/jpeg'").setSpaces("drive")
+							.setFields("nextPageToken, files(id, name)").setPageToken(pageToken).execute();
+					for (File file : result.getFiles()) {
+						System.out.printf("Found file: %s - %s - %s - %s\n", file.getOriginalFilename(), file.getName(),
+								"" + file.getSize(), file.getId());
+					}
+					pageToken = result.getNextPageToken();
+					pages++;
+				} while (pageToken != null && pages < 5);
+
 			}
 			return Void.TYPE;
 		});
