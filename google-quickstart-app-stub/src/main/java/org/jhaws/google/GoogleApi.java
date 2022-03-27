@@ -9,10 +9,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -26,10 +28,6 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.calendar.CalendarScopes;
-import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.gmail.GmailScopes;
-import com.google.api.services.youtube.YouTubeScopes;
 
 // ENABLE API FOR APP: https://console.cloud.google.com/apis/dashboard?project={projectname_hash}
 // https://console.cloud.google.com/home/dashboard
@@ -41,14 +39,6 @@ import com.google.api.services.youtube.YouTubeScopes;
 // https://github.com/googleapis/google-api-java-client-services#supported-google-apis
 public abstract class GoogleApi<S> {
 	protected static final JsonFactory JSON_FACTORY = com.google.api.client.json.gson.GsonFactory.getDefaultInstance();
-
-	protected Collection<String> scopes = Arrays.asList(//
-			YouTubeScopes.YOUTUBE_READONLY//
-			, DriveScopes.DRIVE_METADATA_READONLY//
-			, DriveScopes.DRIVE_READONLY//
-			, CalendarScopes.CALENDAR//
-			, GmailScopes.GMAIL_READONLY //
-	);
 
 	@Value("${google.credentials_file_path}")
 	protected String credentialsFilePath;
@@ -66,6 +56,9 @@ public abstract class GoogleApi<S> {
 
 	protected S service;
 
+	@Autowired
+	protected List<GoogleApi<?>> apis;
+
 	public GoogleApi() {
 		try {
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
@@ -76,6 +69,8 @@ public abstract class GoogleApi<S> {
 		}
 	}
 
+	protected abstract List<String> getScope();
+
 	/**
 	 * Creates an authorized Credential object.
 	 * 
@@ -85,6 +80,9 @@ public abstract class GoogleApi<S> {
 	 */
 	protected Credential getCredentials() {
 		try {
+			Set<String> scopes = new HashSet<>();
+			scopes.addAll(getScope());
+			apis.stream().map(GoogleApi::getScope).forEach(scopes::addAll);
 			// Load client secrets.
 			String userHome = System.getProperty("user.home");
 			Path credentialsPath = Paths.get(userHome).resolve(credentialsFilePath);
@@ -126,14 +124,6 @@ public abstract class GoogleApi<S> {
 
 	public String getQuickstartTokens() {
 		return quickstartTokens;
-	}
-
-	public Collection<String> getScopes() {
-		return scopes;
-	}
-
-	public void setScopes(Collection<String> scopes) {
-		this.scopes = scopes;
 	}
 
 	public String getApplicationName() {

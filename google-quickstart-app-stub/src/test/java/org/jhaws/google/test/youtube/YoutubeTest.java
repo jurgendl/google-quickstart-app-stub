@@ -34,12 +34,12 @@ public class YoutubeTest {
 
 	@Test
 	public void test1() {
-		System.out.println(toString(youtubeApi.videosInternal(Arrays.asList("je_K62Ic6fQ"))));
+		System.out.println(toString(youtubeApi._videos("je_K62Ic6fQ")));
 	}
 
 	@Test
 	public void test2() {
-		System.out.println(toString(youtubeApi.channelInternal("UChfEbvaYvIHmHQWKXA6P_2w")));
+		System.out.println(toString(youtubeApi._channel("UChfEbvaYvIHmHQWKXA6P_2w")));
 	}
 
 	@Test
@@ -49,4 +49,8 @@ public class YoutubeTest {
 						.replace("[", "").replace("]", "").split(", ")))));
 	}
 
+	@Test
+	public void test4() {
+		System.out.println(toString(youtubeApi._comments("UgzDE2tasfmrYLyNkGt4AaABAg")));
+	}
 }

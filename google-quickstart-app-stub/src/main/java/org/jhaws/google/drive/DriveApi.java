@@ -1,8 +1,12 @@
 package org.jhaws.google.drive;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.jhaws.google.GoogleApi;
 
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 
 // https://developers.google.com/drive/api/v3/about-sdk
 // https://developers.google.com/drive/api/v3/quickstart/java
@@ -17,5 +21,10 @@ public class DriveApi extends GoogleApi<Drive> {
 	protected Drive createService() {
 		return new Drive.Builder(httpTransport, JSON_FACTORY, getCredentials()).setApplicationName(applicationName)
 				.build();
+	}
+
+	@Override
+	protected List<String> getScope() {
+		return Arrays.asList(DriveScopes.DRIVE_METADATA_READONLY, DriveScopes.DRIVE_READONLY);
 	}
 }
