@@ -10,6 +10,9 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeScopes;
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.CommentListResponse;
+import com.google.api.services.youtube.model.CommentThreadListResponse;
+import com.google.api.services.youtube.model.SearchListResponse;
+import com.google.api.services.youtube.model.SubscriptionListResponse;
 import com.google.api.services.youtube.model.VideoListResponse;
 
 // https://developers.google.com/youtube
@@ -23,7 +26,7 @@ public class YoutubeApi extends GoogleApi<YouTube> {
 				.build();
 	}
 
-	public List<Video> videos(List<String> ids) {
+	public List<Video> getVideos(List<String> ids) {
 		if (ids.size() > 50) {
 			throw new IllegalArgumentException();
 		}
@@ -46,7 +49,7 @@ public class YoutubeApi extends GoogleApi<YouTube> {
 		});
 	}
 
-	public List<com.google.api.services.youtube.model.Video> _videos(String... ids) {
+	public List<com.google.api.services.youtube.model.Video> videos(String... ids) {
 		if (ids.length > 50) {
 			throw new IllegalArgumentException();
 		}
@@ -58,7 +61,7 @@ public class YoutubeApi extends GoogleApi<YouTube> {
 		});
 	}
 
-	public List<com.google.api.services.youtube.model.Channel> _channel(String... ids) {
+	public List<com.google.api.services.youtube.model.Channel> channel(String... ids) {
 		return doAction(localService -> {
 			YouTube.Channels.List request = localService.channels()
 					.list(Arrays.asList("id", "snippet", "contentDetails", "statistics", "status"));
@@ -67,12 +70,36 @@ public class YoutubeApi extends GoogleApi<YouTube> {
 		});
 	}
 
-	public List<com.google.api.services.youtube.model.Comment> _comments(String parentId) {
+	public List<com.google.api.services.youtube.model.CommentThread> commentThreads(String id) {
 		return doAction(localService -> {
-			YouTube.Comments.List request = localService.comments().list(Arrays.asList("id", "snippet"))/* .list("") */;
-			CommentListResponse response = request.setParentId(parentId)
-					// .setId(Arrays.asList(ids))
-					.execute();
+			YouTube.CommentThreads.List request = localService.commentThreads()
+					.list(Arrays.asList("id", "snippet", "replies"));
+			CommentThreadListResponse response = request.setVideoId(id).execute();
+			return response.getItems();
+		});
+	}
+
+	public List<com.google.api.services.youtube.model.Comment> comments(String parentId) {
+		return doAction(localService -> {
+			YouTube.Comments.List request = localService.comments().list(Arrays.asList("id", "snippet"));
+			CommentListResponse response = request.setParentId(parentId).execute();
+			return response.getItems();
+		});
+	}
+
+	public List<com.google.api.services.youtube.model.SearchResult> search(int max, String search) {
+		return doAction(localService -> {
+			YouTube.Search.List request = localService.search().list(Arrays.asList("id", "snippet"));
+			SearchListResponse response = request.setMaxResults((long) max).setQ(search).execute();
+			return response.getItems();
+		});
+	}
+
+	public List<com.google.api.services.youtube.model.Subscription> mySubscriptions() {
+		return doAction(localService -> {
+			YouTube.Subscriptions.List request = localService.subscriptions()
+					.list(Arrays.asList("id", "snippet", "contentDetails"));
+			SubscriptionListResponse response = request.setMine(true).execute();
 			return response.getItems();
 		});
 	}
