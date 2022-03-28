@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -56,8 +57,8 @@ public abstract class GoogleApi<S> {
 
 	protected S service;
 
-	@Autowired
-	protected List<GoogleApi<?>> apis;
+	@Autowired(required = false)
+	protected List<GoogleApi<?>> apis = Collections.emptyList();
 
 	public GoogleApi() {
 		try {
