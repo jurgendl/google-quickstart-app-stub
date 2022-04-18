@@ -46,7 +46,7 @@ public class DriveTest {
 	@Test
 	public void test() {
 		driveApi.doAction(driveService -> {
-			if (false) {
+			if (true) {
 				FileList result;
 				try {
 					result = driveService.files().list().setPageSize(10).setFields("nextPageToken, files(id, name)")
@@ -75,7 +75,7 @@ public class DriveTest {
 					}
 				}
 			}
-			if (false) {
+			if (true) {
 				int pages = 0;
 				String pageToken = null;
 				do {
