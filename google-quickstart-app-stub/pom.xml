@@ -52,6 +52,7 @@
 		<version.google-api-services-calendar>v3-rev20220203-1.32.1</version.google-api-services-calendar><!-- google-api-services-calendar -->
 		<version.google-api-services-customsearch>v1-rev20210918-1.32.1</version.google-api-services-customsearch><!-- google-api-services-customsearch -->
 		<version.google-api-services-gmail>v1-rev20220307-1.32.1</version.google-api-services-gmail>
+		<version.google-api-services-translate>2.5.0</version.google-api-services-translate>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -111,6 +112,11 @@
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-drive</artifactId>
 			<version>${version.google-api-services-drive}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-translate</artifactId>
+			<version>${version.google-api-services-translate}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.apis</groupId>

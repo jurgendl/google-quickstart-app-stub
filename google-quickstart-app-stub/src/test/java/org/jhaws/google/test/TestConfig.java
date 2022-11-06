@@ -5,6 +5,7 @@ import org.jhaws.google.calendar.CalendarApi;
 import org.jhaws.google.drive.DriveApi;
 import org.jhaws.google.gmail.GmailApi;
 import org.jhaws.google.search.SearchApi;
+import org.jhaws.google.translate.TranslateApi;
 import org.jhaws.google.youtube.YoutubeApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,6 +35,12 @@ import org.springframework.context.annotation.PropertySource;
 		"file:${user.home}/google-app/google-quickstart.yml" //
 }, ignoreResourceNotFound = false, factory = AdaptingPropertySourceFactory.class)
 public class TestConfig {
+	static {
+		System.out.println(System.getProperty("user.home") + "/google-app/google-quickstart.json");
+		System.setProperty("GOOGLE_APPLICATION_CREDENTIALS",
+				System.getProperty("user.home") + "/google-app/google-quickstart.json");
+	}
+
 	@Bean
 	public DriveApi driveApi() {
 		return new DriveApi();
@@ -57,5 +64,10 @@ public class TestConfig {
 	@Bean
 	public GmailApi gmailApi() {
 		return new GmailApi();
+	}
+
+	@Bean
+	public TranslateApi translateApi() {
+		return new TranslateApi();
 	}
 }
