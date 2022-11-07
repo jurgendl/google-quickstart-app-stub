@@ -29,16 +29,26 @@ public class DriveTest {
 	@Autowired
 	DriveApi driveApi;
 
+	// @Test
+	public void testCleanUp() {
+		driveApi.cleanUpTokens();
+	}
+
 	class CustomProgressListener implements MediaHttpDownloaderProgressListener {
+		@Override
 		public void progressChanged(MediaHttpDownloader downloader) {
 			switch (downloader.getDownloadState()) {
-			case MEDIA_IN_PROGRESS:
-				System.out.println(downloader.getProgress());
-				break;
-			case MEDIA_COMPLETE:
-				System.out.println("Download is complete!");
-			default:
-				break;
+				case MEDIA_IN_PROGRESS:
+					System.out.println(downloader.getProgress());
+					break;
+				case MEDIA_COMPLETE:
+					System.out.println("Download is complete!");
+					break;
+				case NOT_STARTED:
+					System.out.println("not-started");
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -49,8 +59,7 @@ public class DriveTest {
 			if (true) {
 				FileList result;
 				try {
-					result = driveService.files().list().setPageSize(10).setFields("nextPageToken, files(id, name)")
-							.execute();
+					result = driveService.files().list().setPageSize(10).setFields("nextPageToken, files(id, name)").execute();
 				} catch (Exception ex) {
 					throw new RuntimeException(ex);
 				}
@@ -79,11 +88,9 @@ public class DriveTest {
 				int pages = 0;
 				String pageToken = null;
 				do {
-					FileList result = driveService.files().list().setQ("mimeType='image/jpeg'").setSpaces("drive")
-							.setFields("nextPageToken, files(id, name)").setPageToken(pageToken).execute();
+					FileList result = driveService.files().list().setQ("mimeType='image/jpeg'").setSpaces("drive").setFields("nextPageToken, files(id, name)").setPageToken(pageToken).execute();
 					for (File file : result.getFiles()) {
-						System.out.printf("Found file: %s - %s - %s - %s\n", file.getOriginalFilename(), file.getName(),
-								"" + file.getSize(), file.getId());
+						System.out.printf("Found file: %s - %s - %s - %s\n", file.getOriginalFilename(), file.getName(), "" + file.getSize(), file.getId());
 					}
 					pageToken = result.getNextPageToken();
 					pages++;

@@ -1,5 +1,6 @@
 package org.jhaws.google;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,19 +89,33 @@ public abstract class GoogleApi<S> {
 			String userHome = System.getProperty("user.home");
 			Path credentialsPath = Paths.get(userHome).resolve(credentialsFilePath);
 			InputStream in = Files.newInputStream(credentialsPath);
-			if (in == null)
-				throw new FileNotFoundException("Resource not found: " + credentialsFilePath);
+			if (in == null) throw new FileNotFoundException("Resource not found: " + credentialsFilePath);
 			GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 			// Build flow and trigger user authorization request.
 			Path quickstartTokensPath = Paths.get(userHome).resolve(quickstartTokens);
 			FileDataStoreFactory dataStore = new FileDataStoreFactory(quickstartTokensPath.toFile());
-			GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
-					clientSecrets, scopes).setDataStoreFactory(dataStore).setAccessType("offline").build();
+			GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, scopes).setDataStoreFactory(dataStore).setAccessType("offline").build();
 			LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(port).build();
 			return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 		} catch (IOException ex) {
 			throw new UncheckedIOException(ex);
 		}
+	}
+
+	private boolean deleteDirectory(File directoryToBeDeleted) {
+		File[] allContents = directoryToBeDeleted.listFiles();
+		if (allContents != null) {
+			for (File file : allContents) {
+				deleteDirectory(file);
+			}
+		}
+		return directoryToBeDeleted.delete();
+	}
+
+	public void cleanUpTokens() {
+		String userHome = System.getProperty("user.home");
+		Path quickstartTokensPath = Paths.get(userHome).resolve(quickstartTokens);
+		deleteDirectory(quickstartTokensPath.toFile());
 	}
 
 	public void setCredentialsFilePath(String credentialsFilePath) {
@@ -149,8 +164,7 @@ public abstract class GoogleApi<S> {
 			if (ex1.getStatusCode() == 403) {
 				try {
 					try {
-						Files.delete(Paths.get(System.getProperty("user.home")).resolve(quickstartTokens)
-								.resolve("StoredCredential"));
+						Files.delete(Paths.get(System.getProperty("user.home")).resolve(quickstartTokens).resolve("StoredCredential"));
 						this.service = null;
 						getService();
 					} catch (IOException ioex) {

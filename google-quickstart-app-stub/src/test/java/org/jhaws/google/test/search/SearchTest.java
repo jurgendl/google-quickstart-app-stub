@@ -26,8 +26,7 @@ public class SearchTest {
 	@Test
 	public void test() {
 		searchApi.doAction(searchService -> {
-			if (true)
-				throw new UnsupportedOperationException();
+			if (true) throw new UnsupportedOperationException();
 			CustomSearchAPI.Cse.List list = searchService.cse().list();
 			Search results = list.execute();
 			List<Result> resultList = results.getItems();
