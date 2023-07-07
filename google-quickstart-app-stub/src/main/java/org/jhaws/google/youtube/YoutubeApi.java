@@ -1,5 +1,6 @@
 package org.jhaws.google.youtube;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import com.google.api.services.youtube.YouTubeScopes;
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.CommentListResponse;
 import com.google.api.services.youtube.model.CommentThreadListResponse;
+import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SubscriptionListResponse;
 import com.google.api.services.youtube.model.VideoListResponse;
@@ -107,5 +109,43 @@ public class YoutubeApi extends GoogleApi<YouTube> {
 	@Override
 	protected List<String> getScope() {
 		return Arrays.asList(YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBE, YouTubeScopes.YOUTUBE_FORCE_SSL);
+	}
+
+	public List<com.google.api.services.youtube.model.PlaylistItem> playlistVideos(String playlistId, int max) {
+		if (max < 1 || max > 1000)
+			throw new IllegalArgumentException("max<1||max>1000");
+		if (playlistId == null)
+			throw new IllegalArgumentException("playlistId==null");
+		final int fixedMax = 50;
+		int page = 0;
+		int pages = 1;
+		final int maxPages = max / fixedMax + (max % fixedMax > 0 ? 1 : 0);
+		String nextPageToken = null;
+		Integer total = null;
+		List<com.google.api.services.youtube.model.PlaylistItem> list = new ArrayList<>();
+		do {
+			final String _nextPageToken = nextPageToken;
+			PlaylistItemListResponse response = doAction(localService -> {
+				YouTube.PlaylistItems.List request = localService.playlistItems()
+						.list(Arrays.asList("id", "snippet", "contentDetails"));
+				request = request.setMaxResults((long) fixedMax).setPlaylistId(playlistId);
+				if (_nextPageToken != null)
+					request.setPageToken(_nextPageToken);
+				PlaylistItemListResponse r = request.execute();
+				return r;
+			});
+			nextPageToken = response.getNextPageToken();
+			response.getItems().stream().filter(x -> !list.contains(x)).forEach(list::add);
+			if (total == null) {
+				total = response.getPageInfo().getTotalResults();
+				pages = response.getPageInfo().getTotalResults() / fixedMax;
+				if (response.getPageInfo().getTotalResults() % fixedMax > 0)
+					pages++;
+			}
+			page++;
+		} while (nextPageToken != null && page < (maxPages + 1));
+		System.out.println(
+				"page=" + page + ", " + "pages=" + pages + ", " + "total=" + total + ", " + "size=" + list.size());
+		return list;
 	}
 }

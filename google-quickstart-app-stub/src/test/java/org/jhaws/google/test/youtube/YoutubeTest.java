@@ -1,6 +1,10 @@
 package org.jhaws.google.test.youtube;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.jhaws.google.test.CustomObjectMapper;
 import org.jhaws.google.test.TestConfig;
@@ -14,6 +18,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.api.services.youtube.model.CommentThread;
+import com.google.api.services.youtube.model.PlaylistItemContentDetails;
+import com.google.api.services.youtube.model.PlaylistItemSnippet;
 
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
@@ -77,6 +83,31 @@ public class YoutubeTest {
 	@Test
 	public void test7() {
 		System.out.println(toString(youtubeApi.mySubscriptions()));
+	}
+
+	@Test
+	public void test8() {
+		List<com.google.api.services.youtube.model.PlaylistItem> list = youtubeApi
+				.playlistVideos("PLMNHo1-W9uvKS8j_OJS8NNIQ5RJBHVwrN", 200);
+		String INVALID_CHARS_REGEX = "[<>:\"/\\\\|?*]";
+		list.forEach(it -> {
+			PlaylistItemContentDetails playlistItemContentDetails = (PlaylistItemContentDetails) it
+					.get("contentDetails");
+			PlaylistItemSnippet playlistItemSnippet = (PlaylistItemSnippet) it.get("snippet");
+			String title = playlistItemSnippet.getTitle();
+			System.out.println(title);
+			title = title.replaceAll(INVALID_CHARS_REGEX, " ");
+			System.out.println(title);
+			File out = new File("d:/__/" + title + ".url");
+			try (FileOutputStream fout = new FileOutputStream(out)) {
+				byte[] b = ("[InternetShortcut]\nURL=https://www.youtube.com/watch?v="
+						+ playlistItemContentDetails.getVideoId() + "\n").getBytes();
+				fout.write(b);
+			} catch (IOException exx) {
+				throw new RuntimeException(exx);
+			}
+			System.out.println();
+		});
 	}
 
 }
