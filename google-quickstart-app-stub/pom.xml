@@ -42,7 +42,7 @@
 		<!-- <maven.site>3.8.2</maven.site> -->
 		<maven.site>3.7.1</maven.site>
 		<!-- ______________ -->
-		<version.jhaws>5.0.3-SNAPSHOT</version.jhaws>
+		<version.jhaws>5.0.5-SNAPSHOT</version.jhaws>
 		<junit>5.6.2</junit>
 		<version.snakeyaml>1.33</version.snakeyaml>
 		<version.google-api-client>1.33.2</version.google-api-client><!-- google-api-client -->
