@@ -111,11 +111,18 @@ public class YoutubeApi extends GoogleApi<YouTube> {
 		return Arrays.asList(YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBE, YouTubeScopes.YOUTUBE_FORCE_SSL);
 	}
 
+	public List<com.google.api.services.youtube.model.PlaylistItem> playlistVideos(int max) {
+		return playlistVideos(true, null, max);
+	}
+
 	public List<com.google.api.services.youtube.model.PlaylistItem> playlistVideos(String playlistId, int max) {
+		return playlistVideos(false, playlistId, max);
+	}
+
+	private List<com.google.api.services.youtube.model.PlaylistItem> playlistVideos(boolean mine, String playlistId,
+			int max) {
 		if (max < 1 || max > 1000)
 			throw new IllegalArgumentException("max<1||max>1000");
-		if (playlistId == null)
-			throw new IllegalArgumentException("playlistId==null");
 		final int fixedMax = 50;
 		int page = 0;
 		int pages = 1;
@@ -126,9 +133,14 @@ public class YoutubeApi extends GoogleApi<YouTube> {
 		do {
 			final String _nextPageToken = nextPageToken;
 			PlaylistItemListResponse response = doAction(localService -> {
-				YouTube.PlaylistItems.List request = localService.playlistItems()
+				com.google.api.services.youtube.YouTube.PlaylistItems pli = localService.playlistItems();
+				com.google.api.services.youtube.YouTube.PlaylistItems.List request = pli
 						.list(Arrays.asList("id", "snippet", "contentDetails"));
-				request = request.setMaxResults((long) fixedMax).setPlaylistId(playlistId);
+				request = request.setMaxResults((long) fixedMax);
+				if (playlistId != null)
+					request = request.setPlaylistId(playlistId);
+				// if(mine)
+				// request=request.setOnBehalfOfContentOwner();
 				if (_nextPageToken != null)
 					request.setPageToken(_nextPageToken);
 				PlaylistItemListResponse r = request.execute();

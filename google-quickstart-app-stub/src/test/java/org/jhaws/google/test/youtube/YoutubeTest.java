@@ -110,4 +110,16 @@ public class YoutubeTest {
 		});
 	}
 
+	@Test
+	public void test9() {
+		List<com.google.api.services.youtube.model.PlaylistItem> list = youtubeApi.playlistVideos(200);
+		list.forEach(it -> {
+			PlaylistItemContentDetails playlistItemContentDetails = (PlaylistItemContentDetails) it
+					.get("contentDetails");
+			PlaylistItemSnippet playlistItemSnippet = (PlaylistItemSnippet) it.get("snippet");
+			String title = playlistItemSnippet.getTitle();
+			System.out.println(title);
+		});
+	}
+
 }
