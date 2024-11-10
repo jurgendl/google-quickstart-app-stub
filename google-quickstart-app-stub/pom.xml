@@ -8,12 +8,12 @@
 	<name>google</name>
 	<url>http://www.example.com</url>
 	<properties>
-		<java.version>11</java.version>
-		<targetJdk.short>11</targetJdk.short>
-		<targetJdk>11</targetJdk>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
-		<maven.compiler.release>11</maven.compiler.release>
+		<java.version>17</java.version>
+		<targetJdk.short>17</targetJdk.short>
+		<targetJdk>17</targetJdk>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.release>17</maven.compiler.release>
 		<forceRecheck>false</forceRecheck>
 		<scope.activation>provided</scope.activation>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,7 +42,7 @@
 		<!-- <maven.site>3.8.2</maven.site> -->
 		<maven.site>3.7.1</maven.site>
 		<!-- ______________ -->
-		<version.jhaws>5.0.6-SNAPSHOT</version.jhaws>
+		<version.jhaws>6.0.0-SNAPSHOT</version.jhaws>
 		<junit>5.6.2</junit>
 		<version.snakeyaml>1.33</version.snakeyaml>
 		<version.google-api-client>1.33.2</version.google-api-client><!-- google-api-client -->
